@@ -18,10 +18,8 @@ jobs:
       # Set up kubectl
       - name: Set up Kubernetes
         run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
-        env:
-          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+          kubectl config current-context
+          kubectl config get-contexts
 
       - name: Apply YAML files
         run: |
