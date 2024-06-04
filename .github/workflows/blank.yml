@@ -23,28 +23,28 @@ jobs:
         env:
           KUBECONFIG: ${{ secrets.KUBECONFIG }}
 
-      - name: Apply file yaml
+      - name: Apply YAML files
         run: |
-          sudo kubectl apply -f persistentVolume.yaml 
-          sudo kubectl apply -f secret.yaml 
-          sudo kubectl apply -f configMap.yaml 
-          sudo kubectl apply -f service.yaml 
-          sudo kubectl apply -f deployment.yaml 
+          kubectl apply -f persistentVolume.yaml 
+          kubectl apply -f secret.yaml 
+          kubectl apply -f configMap.yaml 
+          kubectl apply -f service.yaml 
+          kubectl apply -f deployment.yaml 
 
       - name: Wait for all Pods to be Running
         run: |
           for i in {1..60}; do
-            if sudo kubectl get pods --all-namespaces | grep -v Running | grep -v Completed; then
+            if kubectl get pods --all-namespaces | grep -v Running | grep -v Completed; then
               echo "Waiting for pods to be in Running state..."
-              sudo kubectl get all
+              kubectl get all
               sleep 10
             else
               echo "All pods are in Running state."
-              sudo kubectl get all
+              kubectl get all
               break
             fi
           done
 
       - name: Check resources
         run: |
-          sudo kubectl get all
+          kubectl get all
