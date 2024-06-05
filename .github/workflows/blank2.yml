@@ -1,0 +1,48 @@
+name: CD K8s 2
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu2
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Set up kubectl
+      - name: Set up Kubernetes
+        run: |
+          kubectl config current-context
+          kubectl config get-contexts
+
+      - name: Apply YAML files
+        run: |
+          kubectl apply -f persistentVolume.yaml 
+          kubectl apply -f secrets.yaml 
+          kubectl apply -f configMap.yaml 
+          kubectl apply -f service.yaml 
+          kubectl apply -f deployment.yaml 
+
+      - name: Wait for all Pods to be Running
+        run: |
+          for i in {1..60}; do
+            if kubectl get pods --all-namespaces | grep -v Running | grep -v Completed; then
+              echo "Waiting for pods to be in Running state..."
+              kubectl get all
+              sleep 10
+            else
+              echo "All pods are in Running state."
+              kubectl get all
+              break
+            fi
+          done
+
+      - name: Check resources
+        run: |
+          kubectl get all
